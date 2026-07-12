@@ -1,68 +1,57 @@
-const {
-voter
-}=require("./utils/voteSystem");
-
 require("dotenv").config();
 
 const {
-Client,
-GatewayIntentBits,
-REST,
-Routes
+    Client,
+    GatewayIntentBits,
+    REST,
+    Routes
 } = require("discord.js");
 
 
 const suggestion = require("./commands/suggestion");
+const interactionEvent = require("./events/interactionCreate");
 
 
 const client = new Client({
-    intents:[
+    intents: [
         GatewayIntentBits.Guilds
     ]
 });
 
 
-client.once("ready", async()=>{
 
-console.log(`🏛️ Connecté : ${client.user.tag}`);
+client.once("ready", async () => {
 
-
-const rest = new REST({version:"10"})
-.setToken(process.env.TOKEN);
+    console.log(`🏛️ Architecte connecté : ${client.user.tag}`);
 
 
-await rest.put(
-Routes.applicationCommands(process.env.CLIENT_ID),
-{
-body:[
-suggestion.data
-]
-});
+    const rest = new REST({
+        version: "10"
+    }).setToken(process.env.TOKEN);
 
 
-console.log("✅ Commandes chargées");
+
+    await rest.put(
+        Routes.applicationCommands(process.env.CLIENT_ID),
+        {
+            body: [
+                suggestion.data
+            ]
+        }
+    );
+
+
+    console.log("✅ Commandes installées");
 
 });
 
 
 
 client.on(
-"interactionCreate",
-async interaction=>{
+    "interactionCreate",
+    interactionEvent
+);
 
-
-if(
-interaction.isChatInputCommand()
-&& interaction.commandName==="suggestion"
-){
-
-suggestion.execute(interaction);
-
-}
-
-
-
-});
 
 
 client.login(process.env.TOKEN);
